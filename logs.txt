@@ -1,3 +1,5 @@
+Skipped 1 occurences for HTML Error Pages:
+('jure', ['403 Forbidden'])
 True Positives (59): 
 set([('ashishg', 'e', 'ashishg@stanford.edu'),
      ('ashishg', 'e', 'rozm@stanford.edu'),
@@ -58,8 +60,8 @@ set([('ashishg', 'e', 'ashishg@stanford.edu'),
      ('levoy', 'p', '650-724-6865'),
      ('levoy', 'p', '650-725-3724'),
      ('levoy', 'p', '650-725-4089')])
-False Positives (1): 
-set([('jure', 'e', 'server@cs.stanford.edu')])
+False Positives (0):
+set([])
 False Negatives (0): 
 set([])
-Summary: tp=59, fp=1, fn=0
+Summary: tp=59, fp=0, fn=0

@@ -8,6 +8,7 @@ import pprint
 # Regex patterns to match email addresses
 my_first_pat_email = '([\w\.\-\+]+)([\s]*)(@|\sat\s|\sWHERE\s|&#x40;)([\s]*)(([a-zA-Z0-9\-]+(\.|\sdot\s|\sDOM\s|\;))+)([\w\-]+)'
 my_obfuscate_pat_email = '(obfuscate)\(\'(\w+).edu\'\,\'(\w+)\'\)'
+skip_pat_html_err = '(403 Forbidden|400 Bad Request|401 Unauthorized|404 Not Found|500 Server Error|502 Bad Gateway)'
 
 # Regex patterns to match phone numbers
 my_first_pat_phone = '\(?(\d{3})\)?[- ]?(\d{3})[- ](\d{4})\D+'
@@ -15,7 +16,6 @@ my_second_pat_phone = '(\d{3})&thinsp;(\d{3})&thinsp;(\d{4})\D+'
 
 
 # The following code to parse the regex pattern is modified by 'Rizu Jain'
-
 """ 
 TODO
 This function takes in a filename along with the file object (actually
@@ -42,12 +42,23 @@ def process_file(name, f):
     # note that debug info should be printed to stderr
     # sys.stderr.write('[process_file]\tprocessing file: %s\n' % (path))
     res = []
+
+    # First match and check for any HTML error pages in database
+    # If yes, do not match pattern from it. Return.
+    # If no, process to check all the lines in the file.
+    matches = re.findall(skip_pat_html_err,f.read())
+    if (len(matches) > 0):
+        print("Skipped %d occurences for HTML Error Pages:" % len(matches))
+        print(name,matches)
+        return res
+    f.seek(0)
+
     for line in f:
+
         # Match regex for Email Addresses
         matches = re.findall(my_first_pat_email, line)
         matches.extend(re.findall(my_obfuscate_pat_email, line))
         for m in matches:
-
             # To handle the special case where obfuscate functions are used.
             # If the line matches this string, give inputs from the inverted
             # colons inside the brackets for email first part and the domain.
@@ -64,7 +75,6 @@ def process_file(name, f):
                                                                                         '.'),
                                      m[-1].replace('-',
                                                    ''))
-
             res.append((name, 'e', email))
 
         # Match regex for phone numbers
